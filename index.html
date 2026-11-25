@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAPORAN KAS RT 002 / RW 012 - DESA JATIREJA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        * { text-transform: uppercase !important; }
+        input { outline: none; text-transform: uppercase !important; }
+        input.input-manual::-webkit-outer-spin-button,
+        input.input-manual::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input.input-manual {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        @page {
+            size: A4 portrait;
+            margin: 6mm;
+        }
+        @media print {
+            body * { visibility: hidden; }
+            #tab-laporan, #tab-laporan * { visibility: visible; }
+            #tab-laporan {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: white;
+                border: none;
+                box-shadow: none;
+            }
+            #tab-laporan .max-w-4xl {
+                max-width: 100% !important;
+                padding: 4px !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+            #tab-laporan table th, #tab-laporan table td {
+                padding: 3px 6px !important;
+                font-size: 10px !important;
+            }
+            .no-print { display: none !important; }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen p-3 sm:p-6 font-sans text-slate-800">
+    <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- HEADER & PENGATURAN UTAMA -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 text-center space-y-4 no-print relative">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-slate-100 pb-3 bg-emerald-900 p-4 rounded-xl text-white">
+                <div class="text-left">
+                    <h4 class="text-xs font-bold text-emerald-200 uppercase tracking-wider">STATUS SINKRONISASI REAL-TIME</h4>
+                    <p id="labelStatusSimpan" class="text-xs text-emerald-100 mt-0.5">🔄 MENGHUBUNGKAN KE FIREBASE REALTIME DATABASE...</p>
+                </div>
+                <div class="flex flex-wrap gap-2 items-center flex-shrink-0">
+                    <button onclick="simpanTumpuk()" id="btnSimpanMaster" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer">
+                        💾 SINKRONKAN SEKARANG
+                    </button>
+                    <button onclick="simpanMasterPermanen()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer">
+                        📤 BACKUP FILE HTML
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center gap-3">
+                <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Logo_Kabupaten_Bekasi.jpg" alt="LOGO KABUPATEN BEKASI" class="w-12 sm:w-16 h-auto object-contain mix-blend-multiply flex-shrink-0">
+                <div>
+                    <h2 class="text-xs font-bold tracking-widest text-blue-600 uppercase mt-2">PEMERINTAH DESA JATIREJA RT 002 / RW 012</h2>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">DASHBOARD KAS RT & HUMAS</h1>
+                    <p class="text-sm text-slate-500 mt-1">PERUM PERMATA CIKARANG TIMUR, KABUPATEN BEKASI</p>
+                </div>
+                <div class="w-12 sm:w-16 flex-shrink-0"></div>
+            </div>
+
+            <div class="flex flex-wrap justify-center items-center gap-6 pt-4 border-t border-slate-100">
+                <div class="flex flex-col items-start gap-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">TAHUN LAPORAN</label>
+                    <input type="number" id="inputTahun" value="2026" onchange="kirimKeFirebase(true)" class="w-24 p-2 text-center font-bold border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 bg-slate-50">
+                </div>
+                <div class="flex flex-col items-start gap-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">SALDO AWAL TAHUN (RP)</label>
+                    <input type="number" id="inputSaldoAwal" value="14755000" oninput="kirimKeFirebase(false)" class="w-40 p-2 text-right font-bold border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 bg-slate-50">
+                </div>
+                <div class="flex flex-col items-start gap-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">NAMA KETUA RT</label>
+                    <input type="text" id="inputKetuaRT" value="AGUS SUNARYO" oninput="kirimKeFirebase(false)" class="w-48 p-2 font-bold border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 bg-slate-50">
+                </div>
+                <div class="flex flex-col items-start gap-1">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">NAMA BENDAHARA</label>
+                    <input type="text" id="inputBendahara" value="BENDAHARA RT" oninput="kirimKeFirebase(false)" class="w-48 p-2 font-bold border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 bg-slate-50">
+                </div>
+                <div class="flex flex-col justify-end pb-0.5">
+                    <button onclick="buatWebWarga()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md transition flex items-center gap-2 cursor-pointer">
+                        🌐 BUAT WEB WARGA (HTML)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RINGKASAN KARTU STATISTIK -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 no-print">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-emerald-500">
+                <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">TOTAL PEMASUKAN</p>
+                <p id="lblTotalPemasukan" class="text-xl sm:text-2xl font-black text-emerald-600 mt-1">RP 0</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-rose-500">
+                <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">TOTAL PENGELUARAN</p>
+                <p id="lblTotalPengeluaran" class="text-xl sm:text-2xl font-black text-rose-600 mt-1">RP 0</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-blue-500">
+                <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">SALDO KAS SAAT INI</p>
+                <p id="lblSaldoAkhir" class="text-xl sm:text-2xl font-black text-blue-600 mt-1">RP 0</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-indigo-500">
+                <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">RATA-RATA KEPATUHAN</p>
+                <p id="lblKepatuhan" class="text-xl sm:text-2xl font-black text-indigo-600 mt-1">0%</p>
+            </div>
+        </div>
+
+        <!-- NAVIGASI TAB -->
+        <div class="flex justify-start items-center border-b border-slate-300 pb-2 overflow-x-auto whitespace-nowrap gap-2 no-print">
+            <button onclick="bukaTab('laporan')" id="btn-laporan" class="px-5 py-2.5 text-sm font-bold rounded-xl shadow-sm transition bg-blue-600 text-white cursor-pointer">
+                📄 LAPORAN BULANAN (CETAK)
+            </button>
+            <button onclick="bukaTab('humas')" id="btn-humas" class="px-5 py-2.5 text-sm font-bold rounded-xl shadow-sm transition bg-white text-slate-600 hover:bg-slate-100 cursor-pointer">
+                📋 DATA HUMAS (MASUK)
+            </button>
+            <button onclick="bukaTab('pengeluaran')" id="btn-pengeluaran" class="px-5 py-2.5 text-sm font-bold rounded-xl shadow-sm transition bg-white text-slate-600 hover:bg-slate-100 cursor-pointer">
+                💸 DATA PENGELUARAN (KELUAR)
+            </button>
+            <button onclick="bukaTab('rekap')" id="btn-rekap" class="px-5 py-2.5 text-sm font-bold rounded-xl shadow-sm transition bg-white text-slate-600 hover:bg-slate-100 cursor-pointer">
+                📊 REKAP TAHUNAN
+            </button>
+        </div>
+
+        <!-- TAB 1: LAPORAN BULANAN (CETAK) -->
+        <div id="tab-laporan" class="tab-content active bg-white rounded-2xl shadow-sm border border-slate-200 p-3 sm:p-6 space-y-3">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-slate-200 pb-3 no-print">
+                <div>
+                    <h3 class="text-base font-bold text-slate-800">CETAK DOKUMEN RESMI</h3>
+                    <p class="text-xs text-slate-500">PILIH BULAN LAPORAN UNTUK DICETAK KE PDF ATAU KERTAS.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <label class="text-xs font-bold text-slate-700">PILIH BULAN:</label>
+                    <select id="pilihBulanLaporan" onchange="renderLaporan()" class="bg-blue-50 border border-blue-300 text-blue-900 text-sm rounded-xl p-2 font-bold focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"></select>
+                </div>
+            </div>
+
+            <div class="max-w-4xl mx-auto space-y-3 bg-white p-4 sm:p-8 border border-slate-300 rounded-xl shadow-xs">
+                <!-- KOP SURAT RESMI -->
+                <div class="flex items-center border-b-2 border-slate-900 pb-2">
+                    <div class="w-12 sm:w-16 flex-shrink-0">
+                        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Logo_Kabupaten_Bekasi.jpg" alt="LOGO KABUPATEN BEKASI" class="w-full h-auto object-contain mix-blend-multiply">
+                    </div>
+                    <div class="flex-1 text-center space-y-0.5">
+                        <h4 class="font-bold text-slate-800 uppercase text-[10px] sm:text-xs tracking-wider">PEMERINTAH KABUPATEN BEKASI</h4>
+                        <h4 class="font-bold text-slate-800 uppercase text-[10px] sm:text-xs tracking-wider">KECAMATAN CIKARANG TIMUR — DESA JATIREJA</h4>
+                        <h2 class="font-extrabold text-slate-900 uppercase text-xs sm:text-sm tracking-wide">PENGURUS RT 002 / RW 012</h2>
+                        <p class="text-slate-700 text-[8px] sm:text-[9px] italic">SEKRETARIAT: PERUM PERMATA CIKARANG TIMUR, DESA JATIREJA, KAB. BEKASI</p>
+                    </div>
+                    <div class="w-12 sm:w-16 flex-shrink-0"></div>
+                </div>
+
+                <div class="text-center pb-1">
+                    <h1 id="judulLaporanResmi" class="font-extrabold text-blue-900 text-xs sm:text-sm uppercase underline underline-offset-2">LAPORAN KAS RT</h1>
+                </div>
+
+                <table class="w-full text-left border-collapse text-[11px] sm:text-xs border border-slate-400">
+                    <thead>
+                        <tr class="bg-slate-200 text-slate-900 font-bold">
+                            <th class="p-1.5 border border-slate-400 text-center w-6">NO</th>
+                            <th class="p-1.5 border border-slate-400">URAIAN / KATEGORI</th>
+                            <th class="p-1.5 border border-slate-400">KETERANGAN DETAIL / BLOK</th>
+                            <th class="p-1.5 border border-slate-400 text-right w-24">PEMASUKAN (RP)</th>
+                            <th class="p-1.5 border border-slate-400 text-right w-24">PENGELUARAN (RP)</th>
+                            <th class="p-1.5 border border-slate-400 text-center w-20">STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="isiTabelLaporan" class="divide-y divide-slate-300"></tbody>
+                </table>
+
+                <!-- TANDA TANGAN -->
+                <div class="pt-3 grid grid-cols-2 gap-4 text-center text-xs">
+                    <div class="space-y-10">
+                        <p class="font-semibold text-slate-800">MENGETAHUI,<br>KETUA RT 002 / RW 012</p>
+                        <p id="ttdKetuaRT" class="font-bold underline text-slate-900 uppercase tracking-wide"></p>
+                    </div>
+                    <div class="space-y-10">
+                        <p class="font-semibold text-slate-800">
+                            JATIREJA, 
+                            <input type="text" id="inputTanggalCetak" value="" oninput="kirimKeFirebase(false)" class="border-b border-dashed border-slate-400 w-36 text-center bg-transparent outline-none font-semibold text-slate-800 no-print">
+                            <span id="labelTanggalCetak" class="hidden font-semibold"></span>
+                            <br>BENDAHARA RT 002
+                        </p>
+                        <p id="ttdBendahara" class="font-bold underline text-slate-900 uppercase tracking-wide"></p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-2 no-print border-t border-slate-200 mt-2">
+                    <button onclick="siapkanCetak()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg transition flex items-center gap-2 cursor-pointer">
+                        🖨️ CETAK / SIMPAN LAPORAN KE PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: INPUT PEMASUKAN HUMAS -->
+        <div id="tab-humas" class="tab-content bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden no-print">
+            <div class="p-5 flex justify-between items-center border-b bg-slate-50">
+                <div>
+                    <h3 class="font-extrabold text-slate-800 text-lg">INPUT PEMASUKAN (SETORAN HUMAS)</h3>
+                    <p class="text-xs text-slate-500">MASUKKAN DATA SETORAN WARGA PER BULAN (JAN-DES).</p>
+                </div>
+                <button onclick="tambahBarisData('humas')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow transition cursor-pointer">
+                    + TAMBAH HUMAS
+                </button>
+            </div>
+            <div class="overflow-x-auto p-2">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 border-y border-slate-300 text-slate-700">
+                            <th class="p-2 border-r border-slate-300">NAMA HUMAS</th>
+                            <th class="p-2 border-r border-slate-300">GANG / BLOK</th>
+                            <th class="p-2 text-center border-r border-slate-300">JAN</th>
+                            <th class="p-2 text-center border-r border-slate-300">FEB</th>
+                            <th class="p-2 text-center border-r border-slate-300">MAR</th>
+                            <th class="p-2 text-center border-r border-slate-300">APR</th>
+                            <th class="p-2 text-center border-r border-slate-300">MEI</th>
+                            <th class="p-2 text-center border-r border-slate-300">JUN</th>
+                            <th class="p-2 text-center border-r border-slate-300">JUL</th>
+                            <th class="p-2 text-center border-r border-slate-300">AGU</th>
+                            <th class="p-2 text-center border-r border-slate-300">SEP</th>
+                            <th class="p-2 text-center border-r border-slate-300">OKT</th>
+                            <th class="p-2 text-center border-r border-slate-300">NOV</th>
+                            <th class="p-2 text-center border-r border-slate-300">DES</th>
+                            <th class="p-2 text-right font-bold border-r border-slate-300 bg-blue-50">TOTAL (RP)</th>
+                            <th class="p-2 text-center">HAPUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="isiTabelHumas" class="divide-y divide-slate-200"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 3: INPUT PENGELUARAN -->
+        <div id="tab-pengeluaran" class="tab-content bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden no-print">
+            <div class="p-5 flex justify-between items-center border-b bg-slate-50">
+                <div>
+                    <h3 class="font-extrabold text-slate-800 text-lg">INPUT PENGELUARAN KAS RT</h3>
+                    <p class="text-xs text-slate-500">MASUKKAN DATA PENGELUARAN OPERASIONAL / SOSIAL PER BULAN.</p>
+                </div>
+                <button onclick="tambahBarisData('pengeluaran')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow transition cursor-pointer">
+                    + TAMBAH PENGELUARAN
+                </button>
+            </div>
+            <div class="overflow-x-auto p-2">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 border-y border-slate-300 text-slate-700">
+                            <th class="p-2 border-r border-slate-300">KATEGORI</th>
+                            <th class="p-2 border-r border-slate-300">DETAIL KETERANGAN</th>
+                            <th class="p-2 text-center border-r border-slate-300">JAN</th>
+                            <th class="p-2 text-center border-r border-slate-300">FEB</th>
+                            <th class="p-2 text-center border-r border-slate-300">MAR</th>
+                            <th class="p-2 text-center border-r border-slate-300">APR</th>
+                            <th class="p-2 text-center border-r border-slate-300">MEI</th>
+                            <th class="p-2 text-center border-r border-slate-300">JUN</th>
+                            <th class="p-2 text-center border-r border-slate-300">JUL</th>
+                            <th class="p-2 text-center border-r border-slate-300">AGU</th>
+                            <th class="p-2 text-center border-r border-slate-300">SEP</th>
+                            <th class="p-2 text-center border-r border-slate-300">OKT</th>
+                            <th class="p-2 text-center border-r border-slate-300">NOV</th>
+                            <th class="p-2 text-center border-r border-slate-300">DES</th>
+                            <th class="p-2 text-right font-bold border-r border-slate-300 bg-rose-50">TOTAL (RP)</th>
+                            <th class="p-2 text-center">HAPUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="isiTabelPengeluaran" class="divide-y divide-slate-200"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 4: REKAP TAHUNAN -->
+        <div id="tab-rekap" class="tab-content bg-white rounded-2xl shadow-sm border border-slate-200 p-6 no-print">
+            <h3 class="font-extrabold text-slate-800 text-lg border-b border-slate-200 pb-3 mb-4">TABEL REKAPITULASI ARUS KAS TAHUNAN</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm border border-slate-300">
+                    <thead>
+                        <tr class="bg-slate-100 border-b border-slate-300 text-slate-800">
+                            <th class="p-3 border-r border-slate-300 w-12 text-center">BULAN</th>
+                            <th class="p-3 border-r border-slate-300 text-right">PEMASUKAN (RP)</th>
+                            <th class="p-3 border-r border-slate-300 text-right">PENGELUARAN (RP)</th>
+                            <th class="p-3 border-r border-slate-300 text-right">SALDO KAS NETTO (RP)</th>
+                            <th class="p-3 text-center">PERSENTASE KEPATUHAN</th>
+                        </tr>
+                    </thead>
+                    <tbody id="isiTabelRekap" class="divide-y divide-slate-200"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="dataMasterInjected" data-content="" style="display:none"></div>
+
+    <!-- LIBRARY FIREBASE REALTIME DATABASE -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            databaseURL: "https://kas-rt002-rw01-a1fce-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
+
+        const namaBulan = [
+            'JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI',
+            'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'
+        ];
+
+        let dataHumas = [
+            { nama: 'HUMAS PAK APRIYADI', ket: 'GANG KRISTAL / M1-M2', bulan: new Array(12).fill(0) },
+            { nama: 'HUMAS PAK AZI', ket: 'GANG KRISTAL / M3', bulan: new Array(12).fill(0) },
+            { nama: 'HUMAS PAK BIRIN', ket: 'GANG KRISTAL / M4', bulan: new Array(12).fill(0) },
+            { nama: 'HUMAS PAK NUZUL', ket: 'GANG KRISTAL / M5', bulan: new Array(12).fill(0) },
+            { nama: 'HUMAS PAK ROHMAT', ket: 'GANG KRISTAL / M6', bulan: new Array(12).fill(0) },
+            { nama: 'HUMAS PAK BASUKI', ket: 'GANG KRISTAL RAYA / Q2-M3', bulan: new Array(12).fill(0) },
+            { nama: 'HUMAS PAK RUDI', ket: 'GANG RUBY / R1', bulan: new Array(12).fill(0) }
+        ];
+
+        let dataPengeluaran = [
+            { nama: 'PENGELOLAAN SAMPAH', ket: 'KEBERSIHAN LINGKUNGAN', bulan: new Array(12).fill(0) },
+            { nama: 'JASA KEAMANAN MALAM', ket: 'KEAMANAN', bulan: new Array(12).fill(0) },
+            { nama: 'POSYANDU', ket: 'KEGIATAN WARGA', bulan: new Array(12).fill(0) },
+            { nama: 'SANTUNAN / SOSIAL', ket: 'WARGA SAKIT / DUKA', bulan: new Array(12).fill(0) },
+            { nama: 'PENGELUARAN TAMBAHAN', ket: 'LAIN-LAIN / TAK TERDUGA', bulan: new Array(12).fill(0) }
+        ];
+
+        let dbRef = null;
+        let sedangMenulis = false;
+        let timerTulis = null;
+
+        function getTanggalHariIniFormat() {
+            const tgl = new Date();
+            const hari = tgl.getDate();
+            const bulan = namaBulan[tgl.getMonth()];
+            const tahun = tgl.getFullYear();
+            return `${hari} ${bulan} ${tahun}`;
+        }
+
+        function normalisasiBaris(list) {
+            if (!Array.isArray(list)) return [];
+            return list.map(item => ({
+                nama: String(item.nama || '').toUpperCase(),
+                ket: String(item.ket || '').toUpperCase(),
+                bulan: Array.from({ length: 12 }, (_, idx) => Number((item.bulan && item.bulan[idx]) || 0))
+            }));
+        }
+
+        function ambilStateSaatIni() {
+            return {
+                tahun: Number(document.getElementById('inputTahun').value) || 2026,
+                saldoAwal: Number(document.getElementById('inputSaldoAwal').value) || 0,
+                ketuaRT: document.getElementById('inputKetuaRT').value.toUpperCase(),
+                bendahara: document.getElementById('inputBendahara').value.toUpperCase(),
+                tanggalCetak: document.getElementById('inputTanggalCetak').value.toUpperCase(),
+                humas: normalisasiBaris(dataHumas),
+                pengeluaran: normalisasiBaris(dataPengeluaran),
+                updatedAt: Date.now()
+            };
+        }
+
+        function terapkanStateKeForm(parsed, renderUlangTabelInput = true) {
+            if (!parsed) return;
+            if (parsed.tahun !== undefined) document.getElementById('inputTahun').value = parsed.tahun;
+            if (parsed.saldoAwal !== undefined) document.getElementById('inputSaldoAwal').value = parsed.saldoAwal;
+            if (parsed.ketuaRT !== undefined) document.getElementById('inputKetuaRT').value = String(parsed.ketuaRT).toUpperCase();
+            if (parsed.bendahara !== undefined) document.getElementById('inputBendahara').value = String(parsed.bendahara).toUpperCase();
+            if (parsed.tanggalCetak) {
+                document.getElementById('inputTanggalCetak').value = String(parsed.tanggalCetak).toUpperCase();
+            } else if (!document.getElementById('inputTanggalCetak').value) {
+                document.getElementById('inputTanggalCetak').value = getTanggalHariIniFormat();
+            }
+            if (Array.isArray(parsed.humas)) dataHumas = normalisasiBaris(parsed.humas);
+            if (Array.isArray(parsed.pengeluaran)) dataPengeluaran = normalisasiBaris(parsed.pengeluaran);
+
+            if (renderUlangTabelInput) {
+                renderSemua();
+            } else {
+                renderRekapTahunan();
+                renderLaporan();
+            }
+        }
+
+        function kirimKeFirebase(renderUlangTabelInput = true) {
+            const state = ambilStateSaatIni();
+            try {
+                localStorage.setItem('rt002_master_data', JSON.stringify(state));
+                const encodedData = btoa(encodeURIComponent(JSON.stringify(state)));
+                document.getElementById('dataMasterInjected').setAttribute('data-content', encodedData);
+            } catch (e) {}
+
+            if (renderUlangTabelInput) {
+                renderSemua();
+            } else {
+                renderRekapTahunan();
+                renderLaporan();
+            }
+
+            if (dbRef) {
+                sedangMenulis = true;
+                clearTimeout(timerTulis);
+                dbRef.set(state).then(() => {
+                    document.getElementById('labelStatusSimpan').innerText = "✅ TERSINKRON REAL-TIME KE FIREBASE (HP & LAPTOP)";
+                    timerTulis = setTimeout(() => { sedangMenulis = false; }, 400);
+                }).catch((err) => {
+                    sedangMenulis = false;
+                    document.getElementById('labelStatusSimpan').innerText = "⚠️ GAGAL KIRIM KE FIREBASE: " + err.message;
+                });
+            }
+        }
+
+        function initFirebaseListener() {
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                dbRef = firebase.database().ref("kas_rt_002_012/master");
+
+                dbRef.on("value", (snapshot) => {
+                    if (sedangMenulis) return;
+                    const cloudData = snapshot.val();
+                    if (cloudData) {
+                        terapkanStateKeForm(cloudData, true);
+                        try {
+                            localStorage.setItem('rt002_master_data', JSON.stringify(cloudData));
+                        } catch (e) {}
+                        document.getElementById('labelStatusSimpan').innerText = "✅ TERHUBUNG REAL-TIME KE FIREBASE (HP & LAPTOP)";
+                    } else {
+                        kirimKeFirebase(true);
+                    }
+                }, (err) => {
+                    document.getElementById('labelStatusSimpan').innerText = "⚠️ KONEKSI FIREBASE TERKENDALA: " + err.message;
+                });
+            } catch (e) {
+                document.getElementById('labelStatusSimpan').innerText = "⚠️ ERROR INISIALISASI FIREBASE: " + e.message;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!document.getElementById('inputTanggalCetak').value) {
+                document.getElementById('inputTanggalCetak').value = getTanggalHariIniFormat();
+            }
+
+            const savedData = localStorage.getItem('rt002_master_data');
+            if (savedData) {
+                try {
+                    terapkanStateKeForm(JSON.parse(savedData), false);
+                } catch (e) {}
+            }
+
+            inisialisasiAwal();
+            initFirebaseListener();
+        });
+
+        function formatRp(angka) {
+            return angka === 0 || isNaN(angka) ? '-' : 'RP ' + Number(angka).toLocaleString('id-ID');
+        }
+
+        function getNum(id) {
+            return Number(document.getElementById(id).value) || 0;
+        }
+
+        function getTahun() {
+            return Number(document.getElementById('inputTahun').value) || 2026;
+        }
+
+        function bukaTab(idTab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('button[id^="btn-"]').forEach(el => {
+                el.className = "px-5 py-2.5 text-sm font-bold rounded-xl shadow-sm transition bg-white text-slate-600 hover:bg-slate-100 cursor-pointer";
+            });
+            document.getElementById('tab-' + idTab).classList.add('active');
+            document.getElementById('btn-' + idTab).className = "px-5 py-2.5 text-sm font-bold rounded-xl shadow-sm transition bg-blue-600 text-white cursor-pointer";
+        }
+
+        function simpanTumpuk() {
+            kirimKeFirebase(true);
+            const btn = document.getElementById('btnSimpanMaster');
+            btn.innerText = "✅ TERSINKRON KE CLOUD";
+            btn.className = "px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer";
+            setTimeout(() => {
+                btn.innerText = "💾 SINKRONKAN SEKARANG";
+                btn.className = "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer";
+            }, 2500);
+        }
+
+        function simpanMasterPermanen() {
+            kirimKeFirebase(false);
+            let fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Master_Kas_RT_002_Lengkap.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            alert("FILE BACKUP BERHASIL DI-DOWNLOAD.");
+        }
+
+        function inisialisasiAwal() {
+            let select = document.getElementById('pilihBulanLaporan');
+            if (select.options.length === 0) {
+                namaBulan.forEach((b, i) => select.add(new Option(b.toUpperCase(), i)));
+            }
+            renderSemua();
+        }
+
+        function renderSemua() {
+            renderTabelInput('isiTabelHumas', dataHumas, 'humas');
+            renderTabelInput('isiTabelPengeluaran', dataPengeluaran, 'pengeluaran');
+            renderRekapTahunan();
+            renderLaporan();
+        }
+
+        function renderTabelInput(idBody, dataList, tipe) {
+            let html = '';
+            dataList.forEach((item, rIdx) => {
+                html += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-1 border-r border-slate-200">
+                            <input type="text" value="${item.nama}" oninput="updateData('${tipe}', ${rIdx}, 'nama', this.value)" class="min-w-[160px] p-1.5 border border-slate-300 bg-white rounded text-xs font-semibold focus:border-blue-500 focus:bg-blue-50 w-full">
+                        </td>
+                        <td class="p-1 border-r border-slate-200">
+                            <input type="text" value="${item.ket}" oninput="updateData('${tipe}', ${rIdx}, 'ket', this.value)" class="min-w-[150px] p-1.5 border border-slate-300 bg-white rounded text-xs focus:border-blue-500 focus:bg-blue-50 w-full">
+                        </td>
+                `;
+
+                let totalBaris = 0;
+                item.bulan.forEach((v, bIdx) => {
+                    totalBaris += v;
+                    html += `
+                        <td class="p-1 border-r border-slate-200">
+                            <input type="text" inputmode="numeric" value="${v}" oninput="updateBulan('${tipe}', ${rIdx}, ${bIdx}, this.value)" onfocus="if(this.value=='0') this.value=''" class="input-manual min-w-[60px] p-1.5 border border-slate-300 bg-white rounded text-xs text-center focus:border-blue-500 focus:bg-blue-50 w-full">
+                        </td>
+                    `;
+                });
+
+                let warnaTotal = tipe === 'humas' ? 'text-blue-700 bg-blue-50/50' : 'text-rose-700 bg-rose-50/50';
+                html += `
+                        <td class="p-2 text-right font-bold border-r border-slate-200 ${warnaTotal}">${formatRp(totalBaris)}</td>
+                        <td class="p-1 text-center">
+                            <button onclick="hapusBarisData('${tipe}', ${rIdx})" class="px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 font-bold text-[10px] cursor-pointer">HAPUS</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById(idBody).innerHTML = html;
+        }
+
+        function updateData(tipe, rIdx, key, val) {
+            (tipe === 'humas' ? dataHumas : dataPengeluaran)[rIdx][key] = val.toUpperCase();
+            kirimKeFirebase(false);
+        }
+
+        function updateBulan(tipe, rIdx, bIdx, val) {
+            let bersih = String(val).replace(/[^0-9]/g, '');
+            (tipe === 'humas' ? dataHumas : dataPengeluaran)[rIdx].bulan[bIdx] = Number(bersih) || 0;
+
+            let list = tipe === 'humas' ? dataHumas : dataPengeluaran;
+            let total = list[rIdx].bulan.reduce((s, n) => s + n, 0);
+            let tbodyId = tipe === 'humas' ? 'isiTabelHumas' : 'isiTabelPengeluaran';
+            let rows = document.getElementById(tbodyId).children;
+
+            if (rows[rIdx]) {
+                let totalCell = rows[rIdx].children[14];
+                if (totalCell) {
+                    totalCell.innerText = total === 0 ? '-' : 'RP ' + total.toLocaleString('id-ID');
+                }
+            }
+            kirimKeFirebase(false);
+        }
+
+        function tambahBarisData(tipe) {
+            if (tipe === 'humas') {
+                dataHumas.push({ nama: 'HUMAS BARU', ket: 'BLOK ...', bulan: new Array(12).fill(0) });
+            } else {
+                dataPengeluaran.push({ nama: 'KATEGORI BARU', ket: 'KETERANGAN ...', bulan: new Array(12).fill(0) });
+            }
+            kirimKeFirebase(true);
+        }
+
+        function hapusBarisData(tipe, rIdx) {
+            if (confirm("HAPUS BARIS INI?")) {
+                (tipe === 'humas' ? dataHumas : dataPengeluaran).splice(rIdx, 1);
+                kirimKeFirebase(true);
+            }
+        }
+
+        function renderLaporan() {
+            let bIdx = Number(document.getElementById('pilihBulanLaporan').value) || 0;
+            let tahun = getTahun();
+
+            document.getElementById('judulLaporanResmi').innerText = `LAPORAN KAS RT PERIODE ${namaBulan[bIdx].toUpperCase()} ${tahun}`;
+            document.getElementById('ttdKetuaRT').innerText = document.getElementById('inputKetuaRT').value.toUpperCase();
+            document.getElementById('ttdBendahara').innerText = document.getElementById('inputBendahara').value.toUpperCase();
+
+            let saldoSebelumnya = getNum('inputSaldoAwal');
+            for (let i = 0; i < bIdx; i++) {
+                let p = dataHumas.reduce((sum, item) => sum + item.bulan[i], 0);
+                let k = dataPengeluaran.reduce((sum, item) => sum + item.bulan[i], 0);
+                saldoSebelumnya += (p - k);
+            }
+
+            let html = '';
+            let namaBulanLalu = bIdx === 0 ? `DESEMBER ${tahun - 1}` : `${namaBulan[bIdx - 1]} ${tahun}`;
+
+            html += `
+                <tr class="bg-blue-50/50">
+                    <td class="p-1.5 border border-slate-400 text-center font-bold">I</td>
+                    <td class="p-1.5 border border-slate-400 font-bold text-slate-800">SALDO KAS BULAN SEBELUMNYA</td>
+                    <td class="p-1.5 border border-slate-400 text-slate-600 font-medium">SISA PER AKHIR ${namaBulanLalu}</td>
+                    <td class="p-1.5 border border-slate-400 text-right font-bold text-blue-800">${formatRp(saldoSebelumnya)}</td>
+                    <td class="p-1.5 border border-slate-400"></td>
+                    <td class="p-1.5 border border-slate-400 text-center">-</td>
+                </tr>
+            `;
+
+            html += `
+                <tr class="bg-slate-200">
+                    <td class="p-1.5 border border-slate-400 text-center font-extrabold text-slate-800">II</td>
+                    <td class="p-1.5 border border-slate-400 font-extrabold text-slate-800 tracking-wide" colspan="5">PEMASUKAN IURAN WARGA (HUMAS)</td>
+                </tr>
+            `;
+
+            let totMasuk = 0;
+            dataHumas.forEach((item, i) => {
+                let m = item.bulan[bIdx];
+                totMasuk += m;
+                let status = m > 0
+                    ? '<span class="text-emerald-600 font-bold">TELAH SETOR</span>'
+                    : '<span class="text-rose-500 font-semibold">BELUM SETOR</span>';
+
+                html += `
+                    <tr>
+                        <td class="p-1.5 border border-slate-400 text-center">${i + 1}</td>
+                        <td class="p-1.5 border border-slate-400 font-medium text-slate-800">${item.nama}</td>
+                        <td class="p-1.5 border border-slate-400 text-slate-600">${item.ket}</td>
+                        <td class="p-1.5 border border-slate-400 text-right font-semibold text-slate-800">${formatRp(m)}</td>
+                        <td class="p-1.5 border border-slate-400"></td>
+                        <td class="p-1.5 border border-slate-400 text-center">${status}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                <tr class="bg-emerald-50">
+                    <td class="p-1.5 border border-slate-400" colspan="3">
+                        <span class="float-right font-bold text-slate-800">SUBTOTAL PENERIMAAN KAS :</span>
+                    </td>
+                    <td class="p-1.5 border border-slate-400 text-right font-black text-emerald-700">${formatRp(totMasuk)}</td>
+                    <td class="p-1.5 border border-slate-400"></td>
+                    <td class="p-1.5 border border-slate-400"></td>
+                </tr>
+            `;
+
+            html += `
+                <tr class="bg-slate-200">
+                    <td class="p-1.5 border border-slate-400 text-center font-extrabold text-slate-800">III</td>
+                    <td class="p-1.5 border border-slate-400 font-extrabold text-slate-800 tracking-wide" colspan="5">PENGELUARAN KAS RT</td>
+                </tr>
+            `;
+
+            let totKeluar = 0;
+            let adaPengeluaran = false;
+            let noKeluar = 1;
+
+            dataPengeluaran.forEach((item) => {
+                let k = item.bulan[bIdx];
+                if (k > 0) {
+                    adaPengeluaran = true;
+                    totKeluar += k;
+                    html += `
+                        <tr>
+                            <td class="p-1.5 border border-slate-400 text-center">${noKeluar++}</td>
+                            <td class="p-1.5 border border-slate-400 font-medium text-slate-800">${item.nama}</td>
+                            <td class="p-1.5 border border-slate-400 text-slate-600">${item.ket}</td>
+                            <td class="p-1.5 border border-slate-400"></td>
+                            <td class="p-1.5 border border-slate-400 text-right font-semibold text-rose-700">${formatRp(k)}</td>
+                            <td class="p-1.5 border border-slate-400 text-center">-</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if (!adaPengeluaran) {
+                html += `
+                    <tr>
+                        <td class="p-1.5 border border-slate-400 text-center">1</td>
+                        <td class="p-1.5 border border-slate-400 font-medium text-slate-500 italic" colspan="2">TIDAK ADA PENGELUARAN PADA BULAN INI</td>
+                        <td class="p-1.5 border border-slate-400"></td>
+                        <td class="p-1.5 border border-slate-400 text-right text-slate-500">-</td>
+                        <td class="p-1.5 border border-slate-400 text-center">-</td>
+                    </tr>
+                `;
+            }
+
+            html += `
+                <tr class="bg-rose-50">
+                    <td class="p-1.5 border border-slate-400" colspan="3">
+                        <span class="float-right font-bold text-slate-800">SUBTOTAL PENGELUARAN KAS :</span>
+                    </td>
+                    <td class="p-1.5 border border-slate-400"></td>
+                    <td class="p-1.5 border border-slate-400 text-right font-black text-rose-700">${formatRp(totKeluar)}</td>
+                    <td class="p-1.5 border border-slate-400"></td>
+                </tr>
+            `;
+
+            let saldoAkhir = saldoSebelumnya + totMasuk - totKeluar;
+            html += `
+                <tr class="bg-blue-100">
+                    <td class="p-1.5 border border-slate-400 text-center font-extrabold text-blue-900">IV</td>
+                    <td class="p-1.5 border border-slate-400 font-extrabold text-blue-900 uppercase" colspan="3">SALDO KAS AKHIR BULAN ${namaBulan[bIdx].toUpperCase()} ${tahun}</td>
+                    <td class="p-1.5 border border-slate-400 text-right font-black text-blue-800 text-xs" colspan="2">${formatRp(saldoAkhir)}</td>
+                </tr>
+            `;
+
+            document.getElementById('isiTabelLaporan').innerHTML = html;
+        }
+
+        function renderRekapTahunan() {
+            let saldoAkumulasi = getNum('inputSaldoAwal');
+            let tMasukTahun = 0;
+            let tKeluarTahun = 0;
+            let totalKepatuhan = 0;
+            let html = '';
+
+            namaBulan.forEach((b, i) => {
+                let m = dataHumas.reduce((sum, item) => sum + item.bulan[i], 0);
+                let k = dataPengeluaran.reduce((sum, item) => sum + item.bulan[i], 0);
+
+                saldoAkumulasi += (m - k);
+                tMasukTahun += m;
+                tKeluarTahun += k;
+
+                let patuhCount = 0;
+                dataHumas.forEach(h => {
+                    if (h.bulan[i] > 0) patuhCount++;
+                });
+
+                let persenPatuh = dataHumas.length > 0 ? (patuhCount / dataHumas.length) * 100 : 0;
+                totalKepatuhan += persenPatuh;
+
+                html += `
+                    <tr>
+                        <td class="p-3 border-r border-slate-300 font-semibold text-center bg-slate-50">${b.substring(0, 3).toUpperCase()}</td>
+                        <td class="p-3 border-r border-slate-300 text-right font-medium text-emerald-700">${formatRp(m)}</td>
+                        <td class="p-3 border-r border-slate-300 text-right font-medium text-rose-700">${formatRp(k)}</td>
+                        <td class="p-3 border-r border-slate-300 text-right font-bold text-blue-800 bg-blue-50/30">${formatRp(saldoAkumulasi)}</td>
+                        <td class="p-3 text-center font-medium">${persenPatuh.toFixed(0)}%</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('isiTabelRekap').innerHTML = html;
+            document.getElementById('lblTotalPemasukan').innerText = formatRp(tMasukTahun);
+            document.getElementById('lblTotalPengeluaran').innerText = formatRp(tKeluarTahun);
+            document.getElementById('lblSaldoAkhir').innerText = formatRp(saldoAkumulasi);
+            document.getElementById('lblKepatuhan').innerText = (totalKepatuhan / 12).toFixed(1) + '%';
+        }
+
+        function siapkanCetak() {
+            const inputTgl = document.getElementById('inputTanggalCetak');
+            const labelTgl = document.getElementById('labelTanggalCetak');
+            labelTgl.innerText = inputTgl.value.toUpperCase();
+            inputTgl.style.display = 'none';
+            labelTgl.style.display = 'inline';
+
+            window.print();
+
+            setTimeout(() => {
+                inputTgl.style.display = 'inline-block';
+                labelTgl.style.display = 'none';
+            }, 1000);
+        }
+
+        function buatWebWarga() {
+            let tahun = document.getElementById('inputTahun').value;
+            let bIdx = Number(document.getElementById('pilihBulanLaporan').value) || 0;
+            let namaBulanDipilih = namaBulan[bIdx];
+            let tMasuk = document.getElementById('lblTotalPemasukan').innerText;
+            let tKeluar = document.getElementById('lblTotalPengeluaran').innerText;
+            let sAkhir = document.getElementById('lblSaldoAkhir').innerText;
+            let kepatuhan = document.getElementById('lblKepatuhan').innerText;
+
+            let htmlIsi = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASHBOARD KAS RT 002 - WARGA</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <style>* { text-transform: uppercase !important; }</style>
+</head>
+<body class="bg-slate-100 min-h-screen p-4 font-sans text-slate-800 flex items-center justify-center">
+    <div class="max-w-2xl w-full space-y-6">
+        <div class="bg-white p-6 rounded-3xl shadow-lg border text-center">
+            <h1 class="text-2xl font-extrabold">DASHBOARD KAS RT 002 / RW 012</h1>
+            <p>PERIODE: ${namaBulanDipilih} ${tahun}</p>
+            <p class="text-rose-600 font-bold">HANYA UNTUK DILIHAT</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white p-6 rounded-3xl text-center">
+                <p>TOTAL PEMASUKAN</p>
+                <p class="text-2xl font-black text-emerald-600">${tMasuk}</p>
+            </div>
+            <div class="bg-white p-6 rounded-3xl text-center">
+                <p>TOTAL PENGELUARAN</p>
+                <p class="text-2xl font-black text-rose-600">${tKeluar}</p>
+            </div>
+            <div class="bg-white p-6 rounded-3xl text-center col-span-2">
+                <p>SALDO KAS</p>
+                <p class="text-4xl font-black text-blue-600">${sAkhir}</p>
+            </div>
+            <div class="bg-white p-6 rounded-3xl text-center col-span-2">
+                <p>KEPATUHAN</p>
+                <p class="text-2xl font-black text-indigo-600">${kepatuhan}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
+
+            const blob = new Blob([htmlIsi], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Dashboard_Warga_RT002_${namaBulanDipilih}_${tahun}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+    </script>
+</body>
+</html>
